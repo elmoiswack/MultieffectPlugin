@@ -23,10 +23,10 @@ public:
 	Tremelo();
 	~Tremelo();
 
-	void setSampleRate(double sampleRate);
-	void setWaveform(WaveformTypes waveform);
-	void setRate(float rate);
-	void setDepth(float depth);
+	void setSampleRate(double newSampleRate);
+	void setWaveform(WaveformTypes newWaveform);
+	void setRate(float newRate);
+	void setDepth(float newDepth);
 
 	float applySine();
 	float applyTriangle();

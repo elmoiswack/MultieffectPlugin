@@ -10,7 +10,6 @@ class AudioPluginAudioProcessor;
 class TremeloUIParams : public juce::Component
 {
 private:
-	AudioPluginAudioProcessor& processorRef;
 	TurnableKnob rate;
 	TurnableKnob depth;
 	DropDown select;

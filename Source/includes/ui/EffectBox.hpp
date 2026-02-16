@@ -9,7 +9,6 @@ class AudioPluginAudioProcessor;
 class EffectBox : public juce::Component
 {
 private:
-	AudioPluginAudioProcessor& processorRef;
 	juce::ImageButton powerButton;
 	const juce::String effectName;
 	TurnableKnob volumeKnob;

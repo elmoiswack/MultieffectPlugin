@@ -102,17 +102,13 @@ void AudioPluginAudioProcessorEditor::resized()
     auto width = getWidth();
     this->graph->setBounds(width / 4, 10, width / 2, 60);
 
-    int buttonY = 80;
-    int buttonWidth = 100;
-    int buttonHeight = 30;
-
     auto xOffset = width / 32;
     auto widthBox = (width / 4) - 25;
     auto heightBox = height / 16;
     auto yOffset = 15;
     auto beginHeight = (height / 4) - heightBox;
 
-    std::size_t n = this->effectBoxes.size();
+    int n = static_cast<int>(this->effectBoxes.size());
     int y = beginHeight;
     if (n > 0) {
         for (auto& effectBox : this->effectBoxes) {

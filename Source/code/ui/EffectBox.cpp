@@ -3,7 +3,6 @@
 
 EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage, AudioPluginAudioProcessor& p) : 
     effectName(name), 
-    processorRef(p),
     volumeKnob("Mix", p)
 {
     this->powerButton.setClickingTogglesState(true);

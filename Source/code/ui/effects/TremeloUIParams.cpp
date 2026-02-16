@@ -2,7 +2,6 @@
 #include "../../../includes/dsp/PluginProcessor.h"
 
 TremeloUIParams::TremeloUIParams(AudioPluginAudioProcessor& p) : 
-    processorRef(p),
     rate("tremelo.rate", p),
     depth("tremelo.depth", p),
     select("tremelo.waveform", juce::StringArray("Sine", "Triangle", "Square", "Saw"), p)
@@ -26,8 +25,6 @@ TremeloUIParams::~TremeloUIParams()
 
 void TremeloUIParams::paint(juce::Graphics& g) {
     auto localBoundsW = getLocalBounds().getWidth();
-    auto localBoundsCenterY = getLocalBounds().getCentreY();
-    auto localBoundsH = getLocalBounds().getHeight();
     auto x = 0;
     auto y = 10;
     auto w = localBoundsW;
@@ -49,7 +46,6 @@ void TremeloUIParams::paint(juce::Graphics& g) {
 }
 
 void TremeloUIParams::resized() {
-	auto localBoundsW = getLocalBounds().getWidth();
     auto localBoundsCenterY = getLocalBounds().getCentreY();
     auto localBoundsCenterX = getLocalBounds().getCentreX();
     auto localBoundsH = getLocalBounds().getHeight();

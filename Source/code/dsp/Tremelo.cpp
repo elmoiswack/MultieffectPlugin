@@ -12,33 +12,33 @@ Tremelo::~Tremelo()
 {
 }
 
-void Tremelo::setSampleRate(double sampleRate) {
-	this->sampleRate = sampleRate;
+void Tremelo::setSampleRate(double newSampleRate) {
+	this->sampleRate = newSampleRate;
 }
 
-void Tremelo::setWaveform(WaveformTypes waveform) {
-	this->waveform = waveform;
+void Tremelo::setWaveform(WaveformTypes newWaveform) {
+	this->waveform = newWaveform;
 }
 
-void Tremelo::setRate(float rate) {
-	this->rate = rate;
+void Tremelo::setRate(float newRate) {
+	this->rate = newRate;
 }
 
-void Tremelo::setDepth(float depth) {
-	this->depth = depth;
+void Tremelo::setDepth(float newDepth) {
+	this->depth = newDepth;
 }
 
 float Tremelo::applySine() {
-    return std::sinf(2.0f * M_PI * this->rate * this->t);
+    return std::sinf(static_cast<float>(2.0f * M_PI * this->rate * this->t));
 }
 
 float Tremelo::applyTriangle() {
 	float phase = this->rate * this->t;
-	return (4 * fabs(phase - floor(phase + 0.5)) - 1);
+	return static_cast<float>((4 * fabs(phase - floor(phase + 0.5)) - 1));
 }
 
 float Tremelo::applySquare() {
-	float tremFactor = this->depth * std::sinf(2.0f * M_PI * this->rate * this->t);
+	float tremFactor = this->depth * std::sinf(static_cast<float>(2.0f * M_PI * this->rate * this->t));
 	
 	if (tremFactor >= 1)
 		return 1.0f;
@@ -74,9 +74,9 @@ float Tremelo::amplifyModifaction(float currentSample) {
 		break;
 	}
 
-    this->t += (2.0f * M_PI * this->rate) / this->sampleRate;
-    if (this->t >= 2.0f * M_PI)
-        this->t -= 2.0f * M_PI;
+    this->t += static_cast<float>(2.0f * M_PI * this->rate) / static_cast<float>(this->sampleRate);
+    if (this->t >= static_cast<float>(2.0f * M_PI))
+        this->t -= static_cast<float>(2.0f * M_PI);
 
 	return (tremFactor * currentSample);
 }

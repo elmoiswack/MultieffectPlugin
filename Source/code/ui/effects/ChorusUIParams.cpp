@@ -10,8 +10,6 @@ ChorusUIParams::~ChorusUIParams()
 
 void ChorusUIParams::paint(juce::Graphics& g) {
     auto localBoundsW = getLocalBounds().getWidth();
-    auto localBoundsCenterY = getLocalBounds().getCentreY();
-    auto localBoundsH = getLocalBounds().getHeight();
     auto x = 0;
     auto y = 10;
     auto w = localBoundsW;
