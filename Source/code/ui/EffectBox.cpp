@@ -1,6 +1,10 @@
 #include "../../includes/ui/EffectBox.hpp"
+#include "../../includes/dsp/PluginProcessor.h"
 
-EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage) : effectName(name)
+EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage, AudioPluginAudioProcessor& p) : 
+    effectName(name), 
+    processorRef(p),
+    volumeKnob("Mix", p)
 {
     this->powerButton.setClickingTogglesState(true);
     this->powerButton.setToggleable(true);
@@ -18,8 +22,6 @@ EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage) : e
     this->isSelected = false;
 
 	this->powerButton.setAlpha(0.4f);
-
-    this->volumeKnob.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
 
 	addAndMakeVisible(this->powerButton);
 	addAndMakeVisible(this->volumeKnob);

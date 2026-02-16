@@ -18,7 +18,7 @@ void AudioPluginAudioProcessorEditor::selectEffect(size_t index)
             this->effectParamsBox->setSelectedEffect(std::make_unique<DelayUIParams>());
             break;
         case TREMELO:
-            this->effectParamsBox->setSelectedEffect(std::make_unique<TremeloUIParams>());
+            this->effectParamsBox->setSelectedEffect(std::make_unique<TremeloUIParams>(this->processorRef));
             break;
         case CHORUS:
             this->effectParamsBox->setSelectedEffect(std::make_unique<ChorusUIParams>());
@@ -39,7 +39,6 @@ void AudioPluginAudioProcessorEditor::selectEffect(size_t index)
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
 {
-    juce::ignoreUnused (processorRef);
 
 	this->backgroundImage = juce::ImageCache::getFromMemory(
         BinaryData::elmoonfire_png,
@@ -52,7 +51,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 
     for (std::size_t i = 0; i < this->effects.size(); i++) {
-        auto effect = std::make_unique<EffectBox>(this->effects[i], powerButtonImage);
+        auto effect = std::make_unique<EffectBox>(this->effects[i], powerButtonImage, this->processorRef);
         effect->onClicked = [this, i](void) {
             this->selectEffect(i);
         };
@@ -65,27 +64,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     this->pluginParamsBox = std::make_unique<PluginParamsBox>();
     addAndMakeVisible(*this->pluginParamsBox);
 
-    this->RMSButton.setButtonText("RMS");
-    this->RMSButton.setClickingTogglesState(true);
-    this->RMSButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
-    this->RMSButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);
-    addAndMakeVisible(this->RMSButton);
-    this->RMSButton.onClick = [this]() {
-        this->processorRef.useRMS = this->RMSButton.getToggleState();
-    };
-
-
-    this->setGraphType(AudioGraphTypes::WAVEFORM);
-    this->graphButton.setButtonText("Waveform");
-    this->graphButton.onClick = [this] {
-        if (this->currentGraphType == AudioGraphTypes::WAVEFORM) {
-            this->setGraphType(AudioGraphTypes::OSCILLOSCOPE);
-            this->graphButton.setButtonText("Oscilloscope");
-        } else {
-            this->setGraphType(AudioGraphTypes::WAVEFORM);
-            this->graphButton.setButtonText("Waveform");
-        }
-    };
+    this->graph = std::make_unique<OscilloGraph>();
+    this->currentGraphType = AudioGraphTypes::OSCILLOSCOPE;
+    addAndMakeVisible(*this->graph);
+    this->graphButton.setButtonText("Oscilloscope");
     addAndMakeVisible(this->graphButton);
 
     setSize (1250, 750);
@@ -123,10 +105,6 @@ void AudioPluginAudioProcessorEditor::resized()
     int buttonY = 80;
     int buttonWidth = 100;
     int buttonHeight = 30;
-    
-    this->graphButton.setBounds(width / 4, buttonY, buttonWidth, buttonHeight);
-
-    this->RMSButton.setBounds(width / 4 + buttonWidth, buttonY, buttonWidth, buttonHeight);
 
     auto xOffset = width / 32;
     auto widthBox = (width / 4) - 25;
@@ -136,39 +114,33 @@ void AudioPluginAudioProcessorEditor::resized()
 
     std::size_t n = this->effectBoxes.size();
     int y = beginHeight;
-    for (auto& effectBox : this->effectBoxes) {
-        effectBox->setBounds(xOffset, y, widthBox, heightBox);
-        y += heightBox + yOffset;
+    if (n > 0) {
+        for (auto& effectBox : this->effectBoxes) {
+            if (effectBox) {
+                effectBox->setBounds(xOffset, y, widthBox, heightBox);
+                y += heightBox + yOffset;
+            }
+        }
     }
     
     int totalHeight = n * heightBox + (n - 1) * yOffset;
-    this->effectParamsBox->setBounds(
-        width - (xOffset + widthBox),
-        beginHeight,
-        widthBox,
-        totalHeight
-    );
+    if (this->effectParamsBox) {
+        this->effectParamsBox->setBounds(
+            width - (xOffset + widthBox),
+            beginHeight,
+            widthBox,
+            totalHeight
+        );
+    }
 
-    this->pluginParamsBox->setBounds(
-        xOffset,
-        y,
-        width - (xOffset * 2),
-        heightBox * 2
-    );
-}
-
-void AudioPluginAudioProcessorEditor::setGraphType(AudioGraphTypes type)
-{
-    this->graph.reset();
-
-    if (type == AudioGraphTypes::WAVEFORM)
-        this->graph = std::make_unique<WaveformGraph>();
-    else
-        this->graph = std::make_unique<OscilloGraph>();
-
-    this->currentGraphType = type;
-    addAndMakeVisible(*this->graph);
-    resized();
+    if (this->pluginParamsBox) {
+        this->pluginParamsBox->setBounds(
+            xOffset,
+            y,
+            width - (xOffset * 2),
+            heightBox * 2
+        );
+    }
 }
 
 void AudioPluginAudioProcessorEditor::timerCallback()

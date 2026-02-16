@@ -51,12 +51,14 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    juce::AudioProcessorParameter* getBypassParameter() const override;
+    //juce::AudioProcessorParameter* getBypassParameter() const override;
 
     //==============================================================================
     void getBufferForGraph(juce::AudioBuffer<float>& outBuffer, int graphWidth, AudioGraphTypes type);
     int getHistoryBufferSize();
     std::atomic<bool> useRMS { false };
+
+    juce::AudioProcessorValueTreeState& getApvts();
 
 private:
     //==============================================================================
@@ -75,5 +77,5 @@ private:
     int maxBlockSize = 0;
     Tremelo tremtrem;
     
-    double sampleRate;
+    double sr;
 };

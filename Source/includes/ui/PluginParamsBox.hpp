@@ -10,7 +10,7 @@ private:
 	
 public:
 	PluginParamsBox();
-	~PluginParamsBox();
+	~PluginParamsBox() override;
 
 	void paint (juce::Graphics&) override;
     void resized() override;

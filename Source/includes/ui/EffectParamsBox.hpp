@@ -2,7 +2,7 @@
 # define EFFECTPARAMSBOX_HPP
 
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "./TurnableKnob.hpp"
+#include "./components/TurnableKnob.hpp"
 
 
 class EffectParamsBox : public juce::Component

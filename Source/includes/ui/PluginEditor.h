@@ -5,7 +5,6 @@
 #include "EffectParamsBox.hpp"
 #include "PluginParamsBox.hpp"
 #include "AudioGraph.hpp"
-#include "WaveformGraph.hpp"
 #include "OscilloGraph.hpp"
 #include "effects/ReverbUIParams.hpp"
 #include "effects/DistortionUIParams.hpp"
@@ -37,7 +36,6 @@ public:
     void resized() override;
     void timerCallback() override;
 
-    void setGraphType(AudioGraphTypes type);
     void selectEffect(size_t index);
 
 private:
@@ -46,17 +44,12 @@ private:
     AudioGraphTypes currentGraphType;
 
     juce::Image backgroundImage;
-    juce::Image powerButtonImage;
     
+    juce::Image powerButtonImage;
     std::vector<juce::String> effects { "Reverb", "Distortion", "Delay", "Tremelo", "Chorus", "Phaser", "Flanger"};
     std::vector<std::unique_ptr<EffectBox>> effectBoxes;
     std::unique_ptr<EffectParamsBox> effectParamsBox;
     std::unique_ptr<PluginParamsBox> pluginParamsBox;
-
-    juce::TextButton oscilloscopeButton;
-    juce::TextButton waveformButton;
-
-    juce::TextButton RMSButton;
 
     AudioPluginAudioProcessor& processorRef;
 

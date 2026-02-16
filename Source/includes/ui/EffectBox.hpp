@@ -2,15 +2,18 @@
 # define EFFECTBOX_HPP
 
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "./TurnableKnob.hpp"
+#include "components/TurnableKnob.hpp"
+
+class AudioPluginAudioProcessor;
 
 class EffectBox : public juce::Component
 {
 private:
+	AudioPluginAudioProcessor& processorRef;
 	juce::ImageButton powerButton;
 	const juce::String effectName;
-	TurnableKnob volumeKnob{"MIX"};
-	juce::Slider mixFader;
+	TurnableKnob volumeKnob;
+	juce::Slider mixFader;	
 	bool isSelected;
 
 	const juce::Colour ON = juce::Colours::green;
@@ -18,7 +21,7 @@ private:
 	const juce::Colour SELECTED = juce::Colours::blue;
 
 public:
-	EffectBox(juce::String name, const juce::Image& powerButtonImage);
+	EffectBox(juce::String name, const juce::Image& powerButtonImage, AudioPluginAudioProcessor& p);
 	~EffectBox() override;
 
 	void paint (juce::Graphics&) override;

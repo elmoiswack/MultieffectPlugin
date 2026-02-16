@@ -1,12 +1,7 @@
 #include "../../includes/dsp/Parameters.hpp"
 
 Parameters::Parameters(juce::AudioProcessor& processorRef) : 
-	outputGain{createOutputGain(processorRef)},
-    outputBypass{createOutputBypass(processorRef)},
-    tremeloBypass{createTremeloBypass(processorRef)},
-	tremeloRate{createTremeloRate(processorRef)},
-	tremeloDepth{createTremeloDepth(processorRef)},
-    tremeloWaveform{createTremeloWaveform(processorRef)}
+    apvts{processorRef, nullptr, "Parameters", initApvts()}
 {
 }
 
@@ -14,153 +9,91 @@ Parameters::~Parameters()
 {
 }
 
-juce::AudioParameterBool& Parameters::initAudioParameterBool(
-	juce::AudioProcessor& processorRef,
-	const std::string& paramId,
-	int versionHint,
-	const std::string& name,
-	bool defaultValue
-) {
-    auto parameter = std::make_unique<juce::AudioParameterBool>(
-        juce::ParameterID{ paramId, versionHint },
-        name,
-        defaultValue
-    );
+//// Float parameter (continuous values)
+//std::make_unique<juce::AudioParameterFloat>("id", "Name", min, max, default);
 
-    auto& paramRef = *parameter;
-    processorRef.addParameter(parameter.release());
-    return paramRef;
-}
+//// Int parameter (discrete values)
+//std::make_unique<juce::AudioParameterInt>("id", "Name", minInt, maxInt, defaultInt);
 
-juce::AudioParameterChoice& Parameters::initAudioParameterChoice(
-	juce::AudioProcessor& processorRef,
-	const std::string& paramId,
-	int versionHint,
-	const std::string& name,
-	const juce::StringArray& choices,
-	int defaultValue
-) {
-    auto parameter = std::make_unique<juce::AudioParameterChoice>(
-        juce::ParameterID{ paramId, versionHint },
-        name,
-        choices,
-        defaultValue
-    );
+//// Bool parameter (on/off)
+//std::make_unique<juce::AudioParameterBool>("id", "Name", defaultBool);
 
-    auto& paramRef = *parameter;
-    processorRef.addParameter(parameter.release());
-    return paramRef;
-}
+//// Choice parameter (dropdown)
+//std::make_unique<juce::AudioParameterChoice>("id", "Name", choices, defaultIndex);
 
-juce::AudioParameterFloat& Parameters::initAudioParameterFloat(
-    juce::AudioProcessor& processorRef,
-    const std::string& paramId,
-    int versionHint,
-    const std::string& name,
-    juce::NormalisableRange<float> range,
-    float defaultValue,
-    const std::string& label
-) {
-    auto parameter = std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{ paramId, versionHint },
-        name,
-        range,
-        defaultValue,
-        juce::AudioParameterFloatAttributes{}.withLabel(label)
-    );
+juce::AudioProcessorValueTreeState::ParameterLayout Parameters::initApvts() {
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-    auto& paramRef = *parameter;
-    processorRef.addParameter(parameter.release());
-    return paramRef;
-}
-
-juce::AudioParameterFloat& Parameters::createOutputGain(juce::AudioProcessor& processorRef) {
-    return initAudioParameterFloat(
-        processorRef,
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
         "output.gain",
-        1,
         "Output Gain",
-        { -12.0f, 12.0f, 0.1f, 0.4f },
-        0.0f,
-        "dB"
+        juce::NormalisableRange<float>(-12.0f, 12.0f, 0.1f),
+        0.0f
+        ) //dB
     );
-}
-
-juce::AudioParameterBool& Parameters::createOutputBypass(juce::AudioProcessor& processorRef) {
-    return initAudioParameterBool(
-        processorRef,
+    layout.add(std::make_unique<juce::AudioParameterBool>(
         "output.bypass",
-        1,
         "Output Bypass",
         false
+        ) //bool
     );
+
+    layout.add(std::make_unique<juce::AudioParameterBool>(
+        "tremelo.bypass",
+        "Tremelo Byapss",
+        false
+        ) //bool
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "tremelo.rate",
+        "Tremelo Rate",
+        juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f, 0.3f),
+        5.0f
+        ) //Hz
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "tremelo.depth",
+        "Tremelo Depth",
+        juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f, 0.3f),
+        5.0f
+        ) //Hz
+    );
+    layout.add(std::make_unique<juce::AudioParameterChoice>(
+        "tremelo.waveform",
+        "Tremelo Waveform",
+        juce::StringArray("Sine", "Triangle", "Square", "Saw"),
+        0
+        ) //for enum WaveformTypes
+    );
+
+    return layout;
+}
+
+juce::AudioProcessorValueTreeState& Parameters::getApvts() {
+    return this->apvts;
 }
 
 float Parameters::getOutputGaindB() const {
-	return this->outputGain.get();
+	return this->apvts.getRawParameterValue("output.gain")->load();
 }
 
-juce::AudioParameterBool& Parameters::getOutputBypass() const {
-    return this->outputBypass;
+bool Parameters::getOutputBypass() const {
+    return this->apvts.getRawParameterValue("output.bypass")->load() > 0.5;
 }
 
-juce::AudioParameterBool& Parameters::createTremeloBypass(juce::AudioProcessor& processorRef) {
-    return initAudioParameterBool(
-        processorRef,
-        "tremelo.bypass",
-        1,
-        "Tremelo Bypass",
-        false
-    );
-}
-
-juce::AudioParameterFloat& Parameters::createTremeloRate(juce::AudioProcessor& processorRef) {
-	return initAudioParameterFloat(
-        processorRef,
-        "tremelo.rate",
-		1,
-        "Tremelo Rate",
-        { 0.1f, 20.0f, 0.01f, 0.4f },
-        5.0f,
-        "Hz"
-    );
-}
-
-juce::AudioParameterFloat& Parameters::createTremeloDepth(juce::AudioProcessor& processorRef) {
-    return initAudioParameterFloat(
-        processorRef,
-        "tremelo.depth",
-        1,
-        "Tremelo Depth",
-        { 0.1f, 20.0f, 0.01f, 0.4f },
-        5.0f,
-        "Hz"
-    );
-}
-
-juce::AudioParameterChoice& Parameters::createTremeloWaveform(juce::AudioProcessor& processorRef) {
-    return initAudioParameterChoice(
-        processorRef,
-        "tremelo.waveform",
-        1,
-        "Tremelo Waveform",
-        {"Sine", "Triangle", "Square", "Saw"},
-        0
-    );
-}
 
 bool Parameters::getTremeloBypass() const {
-    return this->tremeloBypass.get();
+    return this->apvts.getRawParameterValue("tremelo.bypass")->load() > 0.5;
 }
 
 int Parameters::getTremeloWaveform() const {
-    return this->tremeloWaveform.getIndex();
+    return static_cast<int>(this->apvts.getRawParameterValue("tremelo.waveform")->load());
 }
 
 float Parameters::getTremeloRate() const {
-	return this->tremeloRate.get();
+	return this->apvts.getRawParameterValue("tremelo.rate")->load();
 }
 
 float Parameters::getTremeloDepth() const {
-	return this->tremeloDepth.get();
+	return this->apvts.getRawParameterValue("tremelo.depth")->load();
 }

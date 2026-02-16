@@ -96,12 +96,12 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     this->historyBuffer.clear();
     this->historyWritePos = 0;
 
-    this->sampleRate = sampleRate;
+    this->sr = sampleRate;
     this->maxBlockSize = samplesPerBlock;
 
-    this->dryBuffer.resize(getTotalNumInputChannels());
+    this->dryBuffer.resize(static_cast<std::size_t>(getTotalNumInputChannels()));
     for (auto& ch : this->dryBuffer)
-        ch.resize(this->maxBlockSize);
+        ch.resize(static_cast<std::size_t>(this->maxBlockSize));
     this->delaylay = Delay(sampleRate, samplesPerBlock, getNumInputChannels());
 
     this->outputGaindB = 0.0f;
@@ -138,10 +138,6 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
   #endif
 }
 
-juce::AudioProcessorParameter* AudioPluginAudioProcessor::getBypassParameter() const {
-    return &this->params.getOutputBypass();
-}
-
 void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                               juce::MidiBuffer& midiMessages)
 {
@@ -157,7 +153,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, numSamples);
 
-    if (this->params.getOutputBypass().get())
+    if (this->params.getOutputBypass())
         return ;
 
     this->tremtrem.setRate(this->params.getTremeloRate());
@@ -180,8 +176,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         //this->delaylay.feedbackDelay(channelIndex, dryData, bufferLength);        
         
         for (int frameIndex = 0; frameIndex < bufferLength; ++frameIndex) {
-            if (!this->params.getTremeloBypass())
-                bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);
+            //if (!this->params.getTremeloBypass())
+            bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);
             
             bufferData[frameIndex] *= outputGain;
         }
@@ -189,30 +185,17 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     //this->delaylay.computeWritingPos(bufferLength);
     
-    std::vector<float> combined(numSamples, 0.0f);
+    std::vector<float> combined(static_cast<std::size_t>(numSamples), 0.0f);
 
-    if (!this->useRMS)
+    for (std::size_t i = 0; i < static_cast<std::size_t>(numSamples); ++i)
     {
-        for (int i = 0; i < numSamples; ++i)
-        {
-            float maxSample = 0.0f;
-            for (int ch = 0; ch < totalChannels; ++ch)
-                maxSample = std::max(maxSample, std::abs(buffer.getSample(ch, i)));
-            combined[i] = maxSample;
-        }
-    }
-    else
-    {
-        for (int i = 0; i < numSamples; ++i)
-        {
-            float sumSquares = 0.0f;
-            for (int ch = 0; ch < totalChannels; ++ch)
-                sumSquares += buffer.getSample(ch, i) * buffer.getSample(ch, i);
-            combined[i] = std::sqrt(sumSquares / totalChannels);
-        }
+        float maxSample = 0.0f;
+        for (int ch = 0; ch < totalChannels; ++ch)
+            maxSample = std::max(maxSample, std::abs(buffer.getSample(ch, static_cast<int>(i))));
+        combined[i] = maxSample;
     }
 
-    for (int i = 0; i < numSamples; ++i)
+    for (std::size_t i = 0; i < static_cast<std::size_t>(numSamples); ++i)
     {
         this->historyBuffer.setSample(0, historyWritePos, combined[i]);
         this->historyWritePos = (historyWritePos + 1) % this->historyBuffer.getNumSamples();
@@ -269,6 +252,11 @@ juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
     return new AudioPluginAudioProcessorEditor (*this);
 }
 
+juce::AudioProcessorValueTreeState& AudioPluginAudioProcessor::getApvts() {
+    return this->params.getApvts();
+}
+
+
 //==============================================================================
 void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
@@ -291,3 +279,4 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new AudioPluginAudioProcessor();
 }
+
