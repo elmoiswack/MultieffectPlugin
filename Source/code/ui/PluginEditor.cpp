@@ -61,7 +61,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     this->effectParamsBox = std::make_unique<EffectParamsBox>();
     addAndMakeVisible(*this->effectParamsBox);
 
-    this->pluginParamsBox = std::make_unique<PluginParamsBox>();
+    this->pluginParamsBox = std::make_unique<PluginParamsBox>(p);
     addAndMakeVisible(*this->pluginParamsBox);
 
     this->graph = std::make_unique<OscilloGraph>();
@@ -134,7 +134,7 @@ void AudioPluginAudioProcessorEditor::resized()
             xOffset,
             y,
             width - (xOffset * 2),
-            heightBox * 2
+            (heightBox * 3) - 10
         );
     }
 }

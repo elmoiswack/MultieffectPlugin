@@ -10,6 +10,7 @@ class EffectBox : public juce::Component
 {
 private:
 	juce::ImageButton powerButton;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> powerButtonAttachement;
 	const juce::String effectName;
 	TurnableKnob volumeKnob;
 	juce::Slider mixFader;	

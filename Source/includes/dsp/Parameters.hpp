@@ -10,63 +10,44 @@ class Parameters
 {
 private:
 	juce::AudioProcessorValueTreeState apvts;
-
-	//juce::AudioParameterFloat& outputGain;
-	//juce::AudioParameterBool& outputBypass;
-
-	//juce::AudioParameterBool& tremeloBypass;
-	//juce::AudioParameterFloat& tremeloRate;
-	//juce::AudioParameterFloat& tremeloDepth;
-	//juce::AudioParameterChoice& tremeloWaveform;
 public:
 	explicit Parameters(juce::AudioProcessor& processorRef);
 	~Parameters();
 
-	//juce::AudioParameterBool& initAudioParameterBool(
-	//	juce::AudioProcessor& processorRef,
-	//	const std::string& paramId,
-	//	int versionHint,
-	//	const std::string& name,
-	//	bool defaultValue
-	//);
-
-	//juce::AudioParameterChoice& initAudioParameterChoice(
-	//	juce::AudioProcessor& processorRef,
-	//	const std::string& paramId,
-	//	int versionHint,
-	//	const std::string& name,
-	//	const juce::StringArray& choices,
-	//	int defaultValue
-	//);
-
-	//juce::AudioParameterFloat& initAudioParameterFloat(
-	//	juce::AudioProcessor& processorRef,
-	//	const std::string& paramId,
-	//	int versionHint,
-	//	const std::string& name,
-	//	juce::NormalisableRange<float> range,
-	//	float defaultValue,
-	//	const std::string& label
-	//);
-
 	juce::AudioProcessorValueTreeState::ParameterLayout initApvts();
-
 	juce::AudioProcessorValueTreeState& getApvts();
 
-
-	//juce::AudioParameterFloat& createOutputGain(juce::AudioProcessor& processorRef);
-	//juce::AudioParameterBool& createOutputBypass(juce::AudioProcessor& processorRef);
+	void initOutput(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
 	float getOutputGaindB() const;
-	bool getOutputBypass() const;
+	float getOutputLowCutdB() const;
+	float getOutputMiddB() const;
+	float getOutputHighCutdB() const;
+	float getOutputVolumedB() const;
+	bool getOutputEnabled() const;
 
-	//juce::AudioParameterBool& createTremeloBypass(juce::AudioProcessor& processorRef);
-	//juce::AudioParameterFloat& createTremeloRate(juce::AudioProcessor& processorRef);
-	//juce::AudioParameterFloat& createTremeloDepth(juce::AudioProcessor& processorRef);
-	//juce::AudioParameterChoice& createTremeloWaveform(juce::AudioProcessor& processorRef);
-	bool getTremeloBypass() const;
+	void initReverb(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	bool getReverbEnabled() const;
+
+	void initDistortion(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	bool getDistortionEnabled() const;
+	
+	void initDelay(juce::AudioProcessorValueTreeState::ParameterLayout& layout);	
+	bool getDelayEnabled() const;
+	
+	void initTremelo(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	bool getTremeloEnabled() const;
 	int getTremeloWaveform() const;
 	float getTremeloRate() const;
 	float getTremeloDepth() const;
+
+	void initChorus(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	bool getChorusEnabled() const;
+
+	void initPhaser(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	bool getPhaserEnabled() const;
+
+	void initFlanger(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	bool getFlangerEnabled() const;
 
 	JUCE_DECLARE_NON_COPYABLE(Parameters)
 	JUCE_DECLARE_NON_MOVEABLE(Parameters)

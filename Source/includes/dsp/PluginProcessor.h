@@ -70,8 +70,6 @@ private:
     
     Parameters params{ *this };
 
-    float outputGaindB;
-
     Delay delaylay;
     std::vector<std::vector<float>> dryBuffer;
     int maxBlockSize = 0;

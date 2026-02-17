@@ -34,7 +34,9 @@ float Tremelo::applySine() {
 
 float Tremelo::applyTriangle() {
 	float phase = this->rate * this->t;
-	return static_cast<float>((4 * fabs(phase - floor(phase + 0.5)) - 1));
+    const auto offsetPhase = phase - juce::MathConstants<float>::halfPi;
+    const auto ft = offsetPhase / juce::MathConstants<float>::twoPi;
+    return 4.f * std::abs(ft - std::floor(ft + 0.5f)) - 1.f;
 }
 
 float Tremelo::applySquare() {

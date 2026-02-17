@@ -104,7 +104,6 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
         ch.resize(static_cast<std::size_t>(this->maxBlockSize));
     this->delaylay = Delay(sampleRate, samplesPerBlock, getNumInputChannels());
 
-    this->outputGaindB = 0.0f;
     this->tremtrem.setSampleRate(sampleRate);
 }
 
@@ -153,15 +152,15 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, numSamples);
 
-    if (this->params.getOutputBypass())
+    if (!this->params.getOutputEnabled())
         return ;
 
     this->tremtrem.setRate(this->params.getTremeloRate());
     this->tremtrem.setDepth(this->params.getTremeloDepth());
     this->tremtrem.setWaveform(static_cast<WaveformTypes>(this->params.getTremeloWaveform()));
 
-    this->outputGaindB = this->params.getOutputGaindB();
-    const float outputGain = juce::Decibels::decibelsToGain(this->outputGaindB, -100.0f);
+    const float outputGain = juce::Decibels::decibelsToGain(this->params.getOutputGaindB(), -100.0f);
+    //const float outputVolume = this->params.getOutputVolumedB();
 
     const int bufferLength = buffer.getNumSamples();
 
@@ -176,10 +175,11 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         //this->delaylay.feedbackDelay(channelIndex, dryData, bufferLength);        
         
         for (int frameIndex = 0; frameIndex < bufferLength; ++frameIndex) {
-            //if (!this->params.getTremeloBypass())
-            bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);
+            if (this->params.getTremeloEnabled())
+                bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);
             
-            bufferData[frameIndex] *= outputGain;
+            bufferData[frameIndex] += (bufferData[frameIndex] * outputGain) / 2;
+            //bufferData[frameIndex] += outputVolume;
         }
     }
     

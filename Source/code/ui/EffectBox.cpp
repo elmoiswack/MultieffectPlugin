@@ -5,10 +5,11 @@ EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage, Aud
     effectName(name), 
     volumeKnob("Mix", p)
 {
+	addAndMakeVisible(this->powerButton);
+	addAndMakeVisible(this->volumeKnob);
+
     this->powerButton.setClickingTogglesState(true);
     this->powerButton.setToggleable(true);
-    this->powerButton.setToggleState(false, juce::dontSendNotification);
-
     this->powerButton.setImages(
         false,   // resizeButtonNowToFitImage =false because of resized
         true,   // preserveProportions
@@ -17,15 +18,13 @@ EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage, Aud
         powerButtonImage,  1.0f, juce::Colours::transparentBlack, // over
         powerButtonImage,  1.0f, juce::Colours::transparentBlack  // down
     );
-    
-    this->isSelected = false;
-
-	this->powerButton.setAlpha(0.4f);
-
-	addAndMakeVisible(this->powerButton);
-	addAndMakeVisible(this->volumeKnob);
-    
-	this->powerButton.onClick = [this]() {
+    this->powerButtonAttachement = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+        p.getApvts(),
+        name.toLowerCase() + ".enabled",
+        powerButton
+    );
+    this->powerButton.setAlpha(0.4f);
+	this->powerButton.onStateChange = [this]() {
 		bool isOn = this->powerButton.getToggleState();
 
 		this->powerButton.setAlpha(isOn ? 1.0f : 0.4f);
@@ -34,6 +33,8 @@ EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage, Aud
 
 		repaint();
 	};
+    this->isSelected = false;
+
 }
 
 EffectBox::~EffectBox()
