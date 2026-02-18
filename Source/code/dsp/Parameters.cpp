@@ -48,32 +48,60 @@ void Parameters::initOutput(juce::AudioProcessorValueTreeState::ParameterLayout&
         ) //dB
     );
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "output.lowcut",
-        "Output LowCut",
-        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
-        20.0f
-        ) //Hz
-    );
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "output.mid",
-        "Output Mid",
-        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
-        750.0f
-        ) //Hz
-    );
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "output.highcut",
-        "Output HighCut",
-        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
-        20000.0f
-        ) //Hz
-    );
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
         "output.volume",
         "Output Volume",
         juce::NormalisableRange<float>(-12.0f, 12.0f, 0.1f),
         0.0f
         ) //dB
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "output.lowcut.frequency",
+        "Output LowCut",
+        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
+        20.0f
+        ) //Hz
+    );
+    layout.add(std::make_unique<juce::AudioParameterChoice>(
+        "tremelo.lowcut.slope",
+        "Tremelo LowCut Slope",
+        juce::StringArray("12 dB/Oct", "24 dB/Oct", "36 dB/Oct", "48 dB/Oct"),
+        0
+        ) //for enum WaveformTypes
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "output.mid.frequency",
+        "Output Mid Frequency",
+        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
+        750.0f
+        ) //Hz
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "output.mid.gain",
+        "Output Mid Gain",
+        juce::NormalisableRange<float>(-24.0f, 24.0f, 0.5f, 1.f),
+        0.0f
+        ) //dB
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "output.mid.quality",
+        "Output Mid Quality",
+        juce::NormalisableRange<float>(0.1f, 10.0f, 0.05f, 1.f),
+        1.0f
+        ) //Hz
+    );
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "output.highcut.frequency",
+        "Output HighCut Frequency",
+        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
+        20000.0f
+        ) //Hz
+    );
+    layout.add(std::make_unique<juce::AudioParameterChoice>(
+        "tremelo.highcut.slope",
+        "Tremelo HighCut Slope",
+        juce::StringArray("12 dB/Oct", "24 dB/Oct", "36 dB/Oct", "48 dB/Oct"),
+        0
+        ) //for enum WaveformTypes
     );
     layout.add(std::make_unique<juce::AudioParameterBool>(
         "output.enabled",
@@ -81,24 +109,41 @@ void Parameters::initOutput(juce::AudioProcessorValueTreeState::ParameterLayout&
         true
         ) //bool
     );
+
+
 }
 
 float Parameters::getOutputGaindB() const {
 	return this->apvts.getRawParameterValue("output.gain")->load();
 }
 
-float Parameters::getOutputLowCutdB() const {
-	return this->apvts.getRawParameterValue("output.lowcut")->load();
+float Parameters::getOutputLowCutFreq() const {
+	return this->apvts.getRawParameterValue("output.lowcut.frequency")->load();
 }
 
-float Parameters::getOutputMiddB() const {
-	return this->apvts.getRawParameterValue("output.mid")->load();
+int Parameters::getOutputLowCutSlope() const {
+    return static_cast<int>(this->apvts.getRawParameterValue("tremelo.lowcut.slope")->load());
 }
 
-float Parameters::getOutputHighCutdB() const {
-	return this->apvts.getRawParameterValue("output.highcut")->load();
+float Parameters::getOutputMidFreq() const {
+    return this->apvts.getRawParameterValue("output.mid.frequency")->load();
 }
 
+float Parameters::getOutputMidGain() const {
+    return this->apvts.getRawParameterValue("output.mid.gain")->load();
+}
+
+float Parameters::getOutputMidQuality() const {
+    return this->apvts.getRawParameterValue("output.mid.quality")->load();
+}
+
+float Parameters::getOutputHighCutFreq() const {
+	return this->apvts.getRawParameterValue("output.highcut.frequency")->load();
+}
+
+int Parameters::getOutputHighCutSlope() const {
+    return static_cast<int>(this->apvts.getRawParameterValue("tremelo.highcut.slope")->load());
+}
 float Parameters::getOutputVolumedB() const {
 	return this->apvts.getRawParameterValue("output.volume")->load();
 }

@@ -106,7 +106,7 @@ void AudioPluginAudioProcessorEditor::resized()
     auto widthBox = (width / 4) - 25;
     auto heightBox = height / 16;
     auto yOffset = 15;
-    auto beginHeight = (height / 4) - heightBox;
+    auto beginHeight = height / 8;
 
     int n = static_cast<int>(this->effectBoxes.size());
     int y = beginHeight;

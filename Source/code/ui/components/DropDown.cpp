@@ -22,7 +22,7 @@ DropDown::DropDown(const juce::String& name, const juce::StringArray& options, A
 	this->setLookAndFeel(&this->customLookAndFeel);
 	this->box.setSelectedItemIndex(0);
 
-    this->attachement = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+    this->attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
         p.getApvts(),
         name,
         this->box
@@ -36,4 +36,10 @@ DropDown::~DropDown()
 
 void DropDown::resized() {
 	this->box.setBounds(getLocalBounds());
+}
+
+void DropDown::setComboboxFont(float fontSize)
+{
+    customLookAndFeel.setFontSize(fontSize);
+    box.repaint();
 }
