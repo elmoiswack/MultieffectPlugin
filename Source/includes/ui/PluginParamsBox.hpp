@@ -4,6 +4,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "components/TurnableKnob.hpp"
 #include "components/DropDown.hpp"
+#include "components/PowerButton.hpp"
 
 class AudioPluginAudioProcessor;
 
@@ -19,9 +20,12 @@ private:
 	TurnableKnob highcutFreq;
 	DropDown highcutSlope;
 	TurnableKnob volume;
+	PowerButton enableLowCut;
+	PowerButton enableMids;
+	PowerButton enableHighCut;
 
 public:
-	explicit PluginParamsBox(AudioPluginAudioProcessor& p);
+	explicit PluginParamsBox(const juce::Image& powerButtonImage, AudioPluginAudioProcessor& p);
 	~PluginParamsBox() override;
 
 	void paint (juce::Graphics&) override;

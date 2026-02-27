@@ -9,6 +9,7 @@
 #include "Delay.hpp"
 #include "Tremelo.hpp"
 #include "Parameters.hpp"
+#include "EQ.hpp"
 
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor
@@ -69,11 +70,12 @@ private:
     int historySize = 0;
     
     Parameters params{ *this };
-
+    EQ eQQ;
     Delay delaylay;
+    Tremelo tremtrem;
+
     std::vector<std::vector<float>> dryBuffer;
     int maxBlockSize = 0;
-    Tremelo tremtrem;
     
     double sr;
 };

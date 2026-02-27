@@ -103,7 +103,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     for (auto& ch : this->dryBuffer)
         ch.resize(static_cast<std::size_t>(this->maxBlockSize));
     this->delaylay = Delay(sampleRate, samplesPerBlock, getNumInputChannels());
-
+    this->eQQ.setSampleRate(sampleRate);
     this->tremtrem.setSampleRate(sampleRate);
 }
 
@@ -155,6 +155,13 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if (!this->params.getOutputEnabled())
         return ;
 
+    this->eQQ.setEnabledLowCut(this->params.getOutputLowCutEnabled());
+    this->eQQ.setLowCutCutoffFreq(this->params.getOutputLowCutFreq());
+    this->eQQ.setLowCutSlope(this->params.getOutputLowCutSlope());
+    this->eQQ.setEnabledHighCut(this->params.getOutputHighCutEnabled());
+    this->eQQ.setHighCutCutoffFreq(this->params.getOutputHighCutFreq());
+    this->eQQ.setHighCutSlope(this->params.getOutputHighCutSlope());
+
     this->tremtrem.setRate(this->params.getTremeloRate());
     this->tremtrem.setDepth(this->params.getTremeloDepth());
     this->tremtrem.setWaveform(static_cast<WaveformTypes>(this->params.getTremeloWaveform()));
@@ -179,6 +186,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                 bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);
             
             bufferData[frameIndex] += (bufferData[frameIndex] * outputGain) / 2;
+            bufferData[frameIndex] = this->eQQ.computeOutputEQ(bufferData[frameIndex]);
             //bufferData[frameIndex] += outputVolume;
         }
     }

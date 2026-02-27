@@ -13,9 +13,9 @@ TurnableKnob::TurnableKnob(const std::string& name, AudioPluginAudioProcessor& p
     this->knob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
 
     this->attachement = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        p.getApvts(),  // The APVTS instance
-        name,                // Parameter ID (must match!)
-        this->knob             // The slider to attach
+        p.getApvts(),
+        name,
+        this->knob
     );
 }
 
@@ -23,8 +23,7 @@ TurnableKnob::~TurnableKnob()
 {
 }
 
-void TurnableKnob::resized() 
-{
+void TurnableKnob::resized() {
     this->knob.setBounds(getLocalBounds());
 }
 

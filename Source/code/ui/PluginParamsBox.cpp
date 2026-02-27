@@ -1,7 +1,7 @@
 #include "../../includes/ui/PluginParamsBox.hpp"
 #include "../../includes/dsp/PluginProcessor.h"
 
-PluginParamsBox::PluginParamsBox(AudioPluginAudioProcessor& p) : 
+PluginParamsBox::PluginParamsBox(const juce::Image& powerButtonImage, AudioPluginAudioProcessor& p) : 
     gain("output.gain", p),
     lowcutFreq("output.lowcut.frequency", p),
     lowcutSlope("output.lowcut.slope", juce::StringArray("12 dB/Oct", "24 dB/Oct", "36 dB/Oct", "48 dB/Oct"), p),
@@ -10,7 +10,10 @@ PluginParamsBox::PluginParamsBox(AudioPluginAudioProcessor& p) :
     midQuality("output.mid.quality", p),
     highcutFreq("output.highcut.frequency", p),
     highcutSlope("output.highcut.slope", juce::StringArray("12 dB/Oct", "24 dB/Oct", "36 dB/Oct", "48 dB/Oct"), p),
-    volume("output.volume", p)
+    volume("output.volume", p),
+    enableLowCut("output.lowcut.enabled", powerButtonImage, p),
+    enableMids("output.mid.enabled", powerButtonImage, p),
+    enableHighCut("output.highcut.enabled", powerButtonImage, p)
 {
     addAndMakeVisible(this->gain);
     this->gain.setAlpha(1.0f);
@@ -22,31 +25,35 @@ PluginParamsBox::PluginParamsBox(AudioPluginAudioProcessor& p) :
     this->volume.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20, " dB");
   
     addAndMakeVisible(this->lowcutFreq);
-    this->lowcutFreq.setAlpha(1.0f);
-    this->lowcutFreq.setEnabled(true);
+    this->lowcutFreq.setEnabled(false);
     this->lowcutFreq.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20, " Hz");
     addAndMakeVisible(this->lowcutSlope);
+    this->lowcutSlope.setEnabled(false);
     this->lowcutSlope.setComboboxFont(15);
 
     addAndMakeVisible(this->midFreq);
-    this->midFreq.setAlpha(1.0f);
-    this->midFreq.setEnabled(true);
+    this->midFreq.setEnabled(false);
     this->midFreq.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20, " Hz");
     addAndMakeVisible(this->midGain);
-    this->midGain.setAlpha(1.0f);
-    this->midGain.setEnabled(true);
+    this->midGain.setEnabled(false);
     this->midGain.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20, " dB");
     addAndMakeVisible(this->midQuality);
-    this->midQuality.setAlpha(1.0f);
-    this->midQuality.setEnabled(true);
+    this->midQuality.setEnabled(false);
     this->midQuality.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20, " Hz");
 
     addAndMakeVisible(this->highcutFreq);
-    this->highcutFreq.setAlpha(1.0f);
-    this->highcutFreq.setEnabled(true);
+    this->highcutFreq.setEnabled(false);
     this->highcutFreq.setCostomTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20, " Hz");
     addAndMakeVisible(this->highcutSlope);
+    this->highcutSlope.setEnabled(false);
     this->highcutSlope.setComboboxFont(15);
+
+    addAndMakeVisible(this->enableLowCut);
+    addAndMakeVisible(this->enableMids);
+    addAndMakeVisible(this->enableHighCut);
+    this->enableLowCut.onClicked = [this]() { repaint(); };
+    this->enableMids.onClicked = [this]() { repaint(); };
+    this->enableHighCut.onClicked = [this]() { repaint(); };
 }
 
 PluginParamsBox::~PluginParamsBox()
@@ -56,6 +63,19 @@ PluginParamsBox::~PluginParamsBox()
 void PluginParamsBox::paint(juce::Graphics& g) {
     g.setColour(juce::Colours::red);
     g.drawRect(getLocalBounds().toFloat(), 2.0f);
+
+    this->lowcutFreq.setEnabled(this->enableLowCut.getSate());
+    this->lowcutFreq.setAlpha(this->enableLowCut.getSate() ? 1.0f : 0.4f);
+    this->lowcutSlope.setEnabled(this->enableLowCut.getSate());
+    this->midGain.setEnabled(this->enableMids.getSate());
+    this->midGain.setAlpha(this->enableMids.getSate() ? 1.0f : 0.4f);
+    this->midFreq.setEnabled(this->enableMids.getSate());
+    this->midFreq.setAlpha(this->enableMids.getSate() ? 1.0f : 0.4f);
+    this->midQuality.setEnabled(this->enableMids.getSate());
+    this->midQuality.setAlpha(this->enableMids.getSate() ? 1.0f : 0.4f);
+    this->highcutFreq.setEnabled(this->enableHighCut.getSate());
+    this->highcutFreq.setAlpha(this->enableHighCut.getSate() ? 1.0f : 0.4f);
+    this->highcutSlope.setEnabled(this->enableHighCut.getSate());
 
     int textHeight = 20;
     int textWidth = 85;
@@ -71,32 +91,55 @@ void PluginParamsBox::paint(juce::Graphics& g) {
     x = boundsVolume.getX();
     g.drawText("Volume", juce::Rectangle<float>(x, y - textHeight, textWidth, textHeight), juce::Justification::centred, false);
 
+    g.setColour(juce::Colours::white.withAlpha(this->enableLowCut.getSate() ? 1.0f : 0.4f));
     x = (getLocalBounds().getCentreX() / 2) + ((getLocalBounds().getCentreX() / 16));
     g.drawText("Lowcut", juce::Rectangle<float>(x, y - textHeight, textWidth, textHeight), juce::Justification::centred, false);
 
+    g.setColour(juce::Colours::white.withAlpha(this->enableMids.getSate() ? 1.0f : 0.4f));
     x = getLocalBounds().getCentreX() - (textWidth / 2);
     g.drawText("Mid", juce::Rectangle<float>(x, y - textHeight, textWidth, textHeight), juce::Justification::centred, false);
 
-    auto boundsHighCut = this->highcutFreq.getBounds().toFloat();
+    g.setColour(juce::Colours::white.withAlpha(this->enableHighCut.getSate() ? 1.0f : 0.4f));
     x = (getLocalBounds().getCentreX() + (getLocalBounds().getCentreX() / 4)) + ((getLocalBounds().getCentreX() / 16));
     g.drawText("Highcut", juce::Rectangle<float>(x, y - textHeight, textWidth, textHeight), juce::Justification::centred, false);
 
+    g.setColour(juce::Colours::white.withAlpha(1.0f));
+    x = getWidth() - (getWidth() / 8) - (textWidth / 2);
+    g.drawText("Enable", juce::Rectangle<float>(x, y - textHeight, textWidth, textHeight), juce::Justification::centred, false);
 
-    auto boundsLowCutSlope = this->lowcutSlope.getBounds();
+    textHeight = 33;
+    textWidth -= 10;
+    g.setFont(13);
+
+    g.setColour(juce::Colours::white.withAlpha(this->enableLowCut.getSate() ? 1.0f : 0.4f));
+    auto boundsLowCutSlope = this->lowcutSlope.getBounds().toFloat();
     auto boundsLowCutFreq = this->lowcutFreq.getBounds().toFloat();
+    y = boundsLowCutSlope.getY() - textHeight;
+    g.drawText("Slope", juce::Rectangle<float>(boundsLowCutSlope.getX() + 5, y, textWidth, textHeight), juce::Justification::centred, false);
+    g.drawText("Frequency", juce::Rectangle<float>(boundsLowCutFreq.getX(), y, textWidth, textHeight), juce::Justification::centred, false);
+
+    g.setColour(juce::Colours::white.withAlpha(this->enableMids.getSate() ? 1.0f : 0.4f));
     auto boundsMidGain = this->midGain.getBounds().toFloat();
     auto boundsMidFreq = this->midFreq.getBounds().toFloat();
-    textHeight = 30;
-    textWidth -= 10;
-    g.setFont(15);
+    auto boundsMidQuality = this->midQuality.getBounds().toFloat();
+    g.drawText("Gain", juce::Rectangle<float>(boundsMidGain.getX(), y, textWidth, textHeight), juce::Justification::centred, false);
+    g.drawText("Frequency", juce::Rectangle<float>(boundsMidFreq.getX(), y, textWidth, textHeight), juce::Justification::centred, false);
+    g.drawText("Quality", juce::Rectangle<float>(boundsMidQuality.getX(), y, textWidth, textHeight), juce::Justification::centred, false);
 
-    x = (boundsLowCutSlope.getX()) + 5;
-    y = boundsLowCutSlope.getY() - textHeight;
-    g.drawText("Slope", juce::Rectangle<float>(x,  y, textWidth, textHeight), juce::Justification::centred, false);
+    g.setColour(juce::Colours::white.withAlpha(this->enableHighCut.getSate() ? 1.0f : 0.4f));
+    auto boundsHighCutFreq = this->highcutFreq.getBounds().toFloat();
+    auto boundsHighCutSlope = this->highcutSlope.getBounds().toFloat();
+    g.drawText("Frequency", juce::Rectangle<float>(boundsHighCutFreq.getX(), y, textWidth, textHeight), juce::Justification::centred, false);
+    g.drawText("Slope", juce::Rectangle<float>(boundsHighCutSlope.getX() + 5, y, textWidth, textHeight), juce::Justification::centred, false);
 
-    x = (boundsLowCutFreq.getX());
-    g.drawText("Frequency", juce::Rectangle<float>(x,  y, textWidth, textHeight), juce::Justification::centred, false);
- 
+    g.setColour(juce::Colours::white.withAlpha(1.0f));
+    auto boundsEnableLow = this->enableLowCut.getBounds().toFloat();
+    auto boundsEnableMid = this->enableMids.getBounds().toFloat();
+    auto boundsEnableHigh = this->enableHighCut.getBounds().toFloat();
+    g.drawText("LowCut", juce::Rectangle<float>(boundsEnableLow.getX() - (textWidth / 4), y, textWidth, textHeight), juce::Justification::centred, false);
+    g.drawText("Mids", juce::Rectangle<float>(boundsEnableMid.getX()  - (textWidth / 4), y, textWidth, textHeight), juce::Justification::centred, false);
+    g.drawText("HighCut", juce::Rectangle<float>(boundsEnableHigh.getX()  - (textWidth / 4), y, textWidth, textHeight), juce::Justification::centred, false);
+
 }
 
 void PluginParamsBox::resized() {
@@ -129,6 +172,9 @@ void PluginParamsBox::resized() {
     int sizeOffset = 10;
     yPos = centerY - (buttonHeight / 2) + yOffset + sizeOffset;
     yPosDrop = centerY - (slopeHeight / 2) - yOffsetSlope + sizeOffset;
+
+ 
+
     this->lowcutSlope.setBounds(
         (buttonWidht * 3.5) - 10,
         yPosDrop,
@@ -174,6 +220,26 @@ void PluginParamsBox::resized() {
         yPosDrop,
         buttonWidht,
         slopeHeight
+    );
+
+
+    this->enableLowCut.setBounds(
+        width - (buttonWidht * 2) - (buttonWidht / 2),
+        yPosDrop,
+        30,
+        30
+    );
+    this->enableMids.setBounds(
+        width - (buttonWidht * 2) + (buttonWidht / 8),
+        yPosDrop,
+        30,
+        30
+    );
+    this->enableHighCut.setBounds(
+        width - (buttonWidht * 2) + (buttonWidht / 4) + (buttonWidht / 2),
+        yPosDrop,
+        30,
+        30
     );
 
 }

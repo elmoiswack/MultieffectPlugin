@@ -40,10 +40,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     : AudioProcessorEditor (&p), processorRef (p)
 {
 
-	this->backgroundImage = juce::ImageCache::getFromMemory(
-        BinaryData::elmoonfire_png,
-        BinaryData::elmoonfire_pngSize
-    );
+	//this->backgroundImage = juce::ImageCache::getFromMemory(
+    //    BinaryData::elmoonfire_png,
+    //    BinaryData::elmoonfire_pngSize
+    //);
     this->powerButtonImage = juce::ImageCache::getFromMemory(
         BinaryData::powerbutton_png,
         BinaryData::powerbutton_pngSize
@@ -51,7 +51,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 
     for (std::size_t i = 0; i < this->effects.size(); i++) {
-        auto effect = std::make_unique<EffectBox>(this->effects[i], powerButtonImage, this->processorRef);
+        auto effect = std::make_unique<EffectBox>(this->effects[i], powerButtonImage, p);
         effect->onClicked = [this, i](void) {
             this->selectEffect(i);
         };
@@ -61,7 +61,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     this->effectParamsBox = std::make_unique<EffectParamsBox>();
     addAndMakeVisible(*this->effectParamsBox);
 
-    this->pluginParamsBox = std::make_unique<PluginParamsBox>(p);
+    this->pluginParamsBox = std::make_unique<PluginParamsBox>(powerButtonImage, p);
     addAndMakeVisible(*this->pluginParamsBox);
 
     this->graph = std::make_unique<OscilloGraph>();
@@ -86,14 +86,14 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g)
     int w = getWidth() / 4;
     int h = getHeight() / 4;
 
-    if (backgroundImage.isValid())
-    {
-        g.drawImage(
-            backgroundImage,
-            juce::Rectangle<float>(w + (w / 2), h + (h / 2), (float)w, (float)h),
-            juce::RectanglePlacement::stretchToFit
-        );
-    }
+    //if (backgroundImage.isValid())
+    //{
+    //    g.drawImage(
+    //        backgroundImage,
+    //        juce::Rectangle<float>(w + (w / 2), h + (h / 2), (float)w, (float)h),
+    //        juce::RectanglePlacement::stretchToFit
+    //    );
+    //}
 }
 
 void AudioPluginAudioProcessorEditor::resized()

@@ -18,16 +18,19 @@ public:
 	juce::AudioProcessorValueTreeState& getApvts();
 
 	void initOutput(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
+	
+	bool getOutputEnabled() const;
 	float getOutputGaindB() const;
 	float getOutputVolumedB() const;
+	bool getOutputLowCutEnabled() const;
 	float getOutputLowCutFreq() const;
 	int getOutputLowCutSlope() const;
 	float getOutputMidFreq() const;
 	float getOutputMidGain() const;
 	float getOutputMidQuality() const;
+	bool getOutputHighCutEnabled() const;
 	float getOutputHighCutFreq() const;
 	int getOutputHighCutSlope() const;
-	bool getOutputEnabled() const;
 
 	void initReverb(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
 	bool getReverbEnabled() const;

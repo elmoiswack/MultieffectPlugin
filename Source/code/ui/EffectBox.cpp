@@ -34,7 +34,6 @@ EffectBox::EffectBox(juce::String name, const juce::Image& powerButtonImage, Aud
 		repaint();
 	};
     this->isSelected = false;
-
 }
 
 EffectBox::~EffectBox()
