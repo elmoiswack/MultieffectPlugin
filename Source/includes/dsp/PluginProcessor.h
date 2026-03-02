@@ -5,7 +5,7 @@
 #include <numeric>
 #include <ranges>
 
-#include "../ui/AudioGraph.hpp"
+#include "../ui/graph/AudioGraph.hpp"
 #include "Delay.hpp"
 #include "Tremelo.hpp"
 #include "Parameters.hpp"

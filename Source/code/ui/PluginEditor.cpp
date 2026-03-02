@@ -64,11 +64,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     this->pluginParamsBox = std::make_unique<PluginParamsBox>(powerButtonImage, p);
     addAndMakeVisible(*this->pluginParamsBox);
 
-    this->graph = std::make_unique<OscilloGraph>();
-    this->currentGraphType = AudioGraphTypes::OSCILLOSCOPE;
+    this->graph = std::make_unique<FrequencyGraph>(static_cast<int>(processorRef.getSampleRate()));
+    this->currentGraphType = AudioGraphTypes::FREQUENCY;
     addAndMakeVisible(*this->graph);
-    this->graphButton.setButtonText("Oscilloscope");
-    addAndMakeVisible(this->graphButton);
+    //this->graphButton.setButtonText("Frequency");
+    //addAndMakeVisible(this->graphButton);
 
     setSize (1250, 750);
     resized();
@@ -142,7 +142,7 @@ void AudioPluginAudioProcessorEditor::resized()
 void AudioPluginAudioProcessorEditor::timerCallback()
 {
     juce::AudioBuffer<float> outputBuffer;
-    int numSamplesToShow = (this->currentGraphType == AudioGraphTypes::WAVEFORM) ? this->processorRef.getHistoryBufferSize() : 1024;
+    int numSamplesToShow = 1024;
 
     this->processorRef.getBufferForGraph(outputBuffer, numSamplesToShow, this->currentGraphType);
     this->graph->setBuffer(outputBuffer);

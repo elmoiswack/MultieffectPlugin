@@ -1,4 +1,4 @@
-#include "../../includes/ui/OscilloGraph.hpp"
+#include "../../../includes/ui/graph/OscilloGraph.hpp"
 
 OscilloGraph::OscilloGraph() {
     setOpaque(true);
@@ -6,8 +6,7 @@ OscilloGraph::OscilloGraph() {
 
 OscilloGraph::~OscilloGraph() = default;
 
-void OscilloGraph::setBuffer(const juce::AudioBuffer<float>& buffer) 
-{
+void OscilloGraph::setBuffer(const juce::AudioBuffer<float>& buffer) {
     this->displayBuffer.makeCopyOf(buffer);
     repaint();
 }

@@ -183,7 +183,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         
         for (int frameIndex = 0; frameIndex < bufferLength; ++frameIndex) {
             if (this->params.getTremeloEnabled())
-                bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);
+                bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);                                                                       
             
             bufferData[frameIndex] += (bufferData[frameIndex] * outputGain) / 2;
             bufferData[frameIndex] = this->eQQ.computeOutputEQ(bufferData[frameIndex]);

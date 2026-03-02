@@ -1,4 +1,4 @@
-#include "../../includes/ui/AudioGraph.hpp"
+#include "../../../includes/ui/graph/AudioGraph.hpp"
 
 AudioGraph::AudioGraph() {
 	setOpaque(true);

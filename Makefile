@@ -3,12 +3,15 @@ PLUGIN_NAME = FirstVST
 BUILD_DIR = build
 
 APP_PATH = $(BUILD_DIR)/FirstVST_artefacts/Standalone/$(PLUGIN_NAME).app
+EXECUTABLE_PATH = $(BUILD_DIR)/FirstVST_artefacts/Standalone/$(PLUGIN_NAME).app/Contents/MacOS/FirstVST
 
-.PHONY: all clean open
+.PHONY: all app re delete_appledouble cmake_build openapp executable clean
 
-all: delete_appledouble cmake_build app
+all: delete_appledouble cmake_build executable
 
-re: clean delete_appledouble cmake_build app
+app: delete_appledouble cmake_build openapp
+
+re: clean delete_appledouble cmake_build executable
 
 delete_appledouble:
 	@echo "Deleting AppleDouble files..."
@@ -19,9 +22,13 @@ cmake_build:
 	@cmake -S . -B  $(BUILD_DIR)  -DFETCHCONTENT_QUIET=Off
 	@cmake --build $(BUILD_DIR)
 
-app:
+openapp:
 	@echo "Opening the app..."
 	@open $(APP_PATH)
+
+executable:
+	@echo "Running debug mode..."
+	@./${EXECUTABLE_PATH}
 
 clean:
 	@echo "Cleaning build directory..."

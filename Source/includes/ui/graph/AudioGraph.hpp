@@ -6,7 +6,7 @@
 
 enum AudioGraphTypes {
 	OSCILLOSCOPE,
-	WAVEFORM,
+	FREQUENCY,
 };
 
 class AudioGraph : public juce::Component
