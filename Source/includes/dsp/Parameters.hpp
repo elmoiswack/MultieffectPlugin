@@ -40,6 +40,8 @@ public:
 	
 	void initDelay(juce::AudioProcessorValueTreeState::ParameterLayout& layout);	
 	bool getDelayEnabled() const;
+	float getDelayFeedbackGain() const;
+	float getDelayTime() const;
 	
 	void initTremelo(juce::AudioProcessorValueTreeState::ParameterLayout& layout);
 	bool getTremeloEnabled() const;

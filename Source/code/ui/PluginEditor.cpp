@@ -15,7 +15,7 @@ void AudioPluginAudioProcessorEditor::selectEffect(size_t index)
             this->effectParamsBox->setSelectedEffect(std::make_unique<DistortionUIParams>());
             break;
         case DELAY:
-            this->effectParamsBox->setSelectedEffect(std::make_unique<DelayUIParams>());
+            this->effectParamsBox->setSelectedEffect(std::make_unique<DelayUIParams>(this->processorRef));
             break;
         case TREMELO:
             this->effectParamsBox->setSelectedEffect(std::make_unique<TremeloUIParams>(this->processorRef));
@@ -64,7 +64,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     this->pluginParamsBox = std::make_unique<PluginParamsBox>(powerButtonImage, p);
     addAndMakeVisible(*this->pluginParamsBox);
 
-    this->graph = std::make_unique<FrequencyGraph>(static_cast<int>(processorRef.getSampleRate()));
+    this->graph = std::make_unique<FrequencyGraph>(processorRef.analyzer);
     this->currentGraphType = AudioGraphTypes::FREQUENCY;
     addAndMakeVisible(*this->graph);
     //this->graphButton.setButtonText("Frequency");
@@ -139,11 +139,4 @@ void AudioPluginAudioProcessorEditor::resized()
     }
 }
 
-void AudioPluginAudioProcessorEditor::timerCallback()
-{
-    juce::AudioBuffer<float> outputBuffer;
-    int numSamplesToShow = 1024;
-
-    this->processorRef.getBufferForGraph(outputBuffer, numSamplesToShow, this->currentGraphType);
-    this->graph->setBuffer(outputBuffer);
-}
+void AudioPluginAudioProcessorEditor::timerCallback() {}

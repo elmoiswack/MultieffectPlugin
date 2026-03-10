@@ -9,7 +9,7 @@ private:
     juce::AudioBuffer<float> delayBuffer;
 	int writingPos = {0};
 
-	int delayTime = 250;
+	float delayTime = 250.0f;
 	float feedbackGain = 0.6f;
 
 public:
@@ -26,6 +26,9 @@ public:
 
 	int getBufferLenght();
 	int getWritingPos();
+
+	void setDelayTime(float value);
+	void setFeedbackGain(float value);
 };
 
 #endif

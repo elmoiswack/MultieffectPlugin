@@ -19,9 +19,7 @@ TremeloUIParams::TremeloUIParams(AudioPluginAudioProcessor& p) :
     this->depth.setAlpha(1.0f);
 }
 
-TremeloUIParams::~TremeloUIParams()
-{
-}
+TremeloUIParams::~TremeloUIParams() {}
 
 void TremeloUIParams::paint(juce::Graphics& g) {
     auto localBoundsW = getLocalBounds().getWidth();

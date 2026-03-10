@@ -1,33 +1,30 @@
 #include "../../../includes/ui/graph/OscilloGraph.hpp"
 
-OscilloGraph::OscilloGraph() {
+OscilloGraph::OscilloGraph(AudioAnalyzer& analyzer) : AudioGraph(analyzer) {
     setOpaque(true);
 }
 
 OscilloGraph::~OscilloGraph() = default;
 
-void OscilloGraph::setBuffer(const juce::AudioBuffer<float>& buffer) {
-    this->displayBuffer.makeCopyOf(buffer);
-    repaint();
-}
+void OscilloGraph::drawGraph(juce::Graphics& g) {
+    juce::AudioBuffer<float> buffer;
+    this->analyzer.getRecentSamples(buffer, 1024);
 
-void OscilloGraph::drawGraph(juce::Graphics& g)
-{
     int width = getWidth();
     int height = getHeight();
-    int numSamples = this->displayBuffer.getNumSamples();
+    int numSamples = buffer.getNumSamples();
     float centerY = height / 2.0f;
     float scaleY = height / 2.0f * 1.2f;
 
     juce::Path p;
 
-    float firstY = centerY - this->displayBuffer.getSample(0, 0) * scaleY;
+    float firstY = centerY - buffer.getSample(0, 0) * scaleY;
     p.startNewSubPath(0.0f, firstY);
 
-    for (int x = 1; x < width; ++x)
-    {
+    for (int x = 1; x < width; ++x) {
         int sampleIdx = x * numSamples / width;
-        float y = centerY - this->displayBuffer.getSample(0, sampleIdx) * scaleY;
+        float y = centerY - buffer.getSample(0, sampleIdx) * scaleY;
+        
         p.lineTo((float)x, y);
     }
 

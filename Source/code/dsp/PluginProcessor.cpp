@@ -91,17 +91,19 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {   
     juce::ignoreUnused (samplesPerBlock);
 
+    analyzer.prepare(sampleRate);
+
     this->historySize = static_cast<int>(sampleRate * 5);
     this->historyBuffer.setSize(1, this->historySize);
     this->historyBuffer.clear();
     this->historyWritePos = 0;
 
-    this->sr = sampleRate;
     this->maxBlockSize = samplesPerBlock;
 
     this->dryBuffer.resize(static_cast<std::size_t>(getTotalNumInputChannels()));
     for (auto& ch : this->dryBuffer)
         ch.resize(static_cast<std::size_t>(this->maxBlockSize));
+    
     this->delaylay = Delay(sampleRate, samplesPerBlock, getNumInputChannels());
     this->eQQ.setSampleRate(sampleRate);
     this->tremtrem.setSampleRate(sampleRate);
@@ -166,32 +168,39 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     this->tremtrem.setDepth(this->params.getTremeloDepth());
     this->tremtrem.setWaveform(static_cast<WaveformTypes>(this->params.getTremeloWaveform()));
 
+    this->delaylay.setDelayTime(this->params.getDelayTime());
+    this->delaylay.setFeedbackGain(this->params.getDelayFeedbackGain());
+    auto delayEnabled = this->params.getDelayEnabled();
+
     const float outputGain = juce::Decibels::decibelsToGain(this->params.getOutputGaindB(), -100.0f);
     //const float outputVolume = this->params.getOutputVolumedB();
 
-    const int bufferLength = buffer.getNumSamples();
-
     for (int channelIndex = 0; channelIndex < totalNumInputChannels; channelIndex++) {
         auto* bufferData = buffer.getWritePointer(channelIndex);
-        //float* dryData = this->dryBuffer[channelIndex].data();
+        float* dryData = this->dryBuffer[channelIndex].data();
 
-        //std::memcpy(dryData, bufferData, sizeof(float) * bufferLength);
+        std::memcpy(dryData, bufferData, sizeof(float) * numSamples);
 
-        //this->delaylay.copyBufferIntoDelay(channelIndex, bufferData, bufferLength);
-        //this->delaylay.copyDelayBufferIntoBuffer(channelIndex, buffer, bufferLength, this->sampleRate);
-        //this->delaylay.feedbackDelay(channelIndex, dryData, bufferLength);        
+        if (delayEnabled) {
+            this->delaylay.copyBufferIntoDelay(channelIndex, bufferData, numSamples);
+            this->delaylay.copyDelayBufferIntoBuffer(channelIndex, buffer, numSamples, this->getSampleRate());
+            this->delaylay.feedbackDelay(channelIndex, dryData, numSamples);
+        }
         
-        for (int frameIndex = 0; frameIndex < bufferLength; ++frameIndex) {
+        for (int frameIndex = 0; frameIndex < numSamples; ++frameIndex) {
+            bufferData[frameIndex] += (bufferData[frameIndex] * outputGain) / 2;
+            
             if (this->params.getTremeloEnabled())
                 bufferData[frameIndex] = tremtrem.amplifyModifaction(bufferData[frameIndex]);                                                                       
-            
-            bufferData[frameIndex] += (bufferData[frameIndex] * outputGain) / 2;
             bufferData[frameIndex] = this->eQQ.computeOutputEQ(bufferData[frameIndex]);
+            
             //bufferData[frameIndex] += outputVolume;
         }
     }
+    this->analyzer.pushSamples(buffer);
     
-    //this->delaylay.computeWritingPos(bufferLength);
+    if (delayEnabled)
+        this->delaylay.computeWritingPos(numSamples);
     
     std::vector<float> combined(static_cast<std::size_t>(numSamples), 0.0f);
 

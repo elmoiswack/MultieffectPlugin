@@ -2,14 +2,13 @@
 # define OSCILLOSCOPE_HPP
 
 #include "./AudioGraph.hpp"
+#include "../../dsp/AudioAnalyzer.hpp"
 
 class OscilloGraph : public AudioGraph
 {
 public:
-	OscilloGraph();
+	OscilloGraph(AudioAnalyzer& analyzer);
 	~OscilloGraph() override;
-
-	void setBuffer(const juce::AudioBuffer<float>& buffer) override;
 
 protected:
 	void drawGraph(juce::Graphics& g) override;

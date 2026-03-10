@@ -3,6 +3,7 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_audio_basics/juce_audio_basics.h>
+#include "../../dsp/AudioAnalyzer.hpp"
 
 enum AudioGraphTypes {
 	OSCILLOSCOPE,
@@ -12,18 +13,14 @@ enum AudioGraphTypes {
 class AudioGraph : public juce::Component
 {
 protected:
+	AudioAnalyzer& analyzer;
+	
     virtual void drawGraph (juce::Graphics& g) = 0;
-    juce::AudioBuffer<float> displayBuffer;
+	void paint (juce::Graphics& g) override;
 
 public:
-	AudioGraph();
+	AudioGraph(AudioAnalyzer& analyzer);
 	~AudioGraph() override;
-
-	void paint (juce::Graphics& g) override;
-    void resized() override;
-
-	virtual void setBuffer(const juce::AudioBuffer<float>& buffer);
-	juce::AudioBuffer<float> getBuffer();
 };
 
 #endif

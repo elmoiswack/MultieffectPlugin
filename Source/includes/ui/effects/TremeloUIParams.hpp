@@ -22,6 +22,4 @@ public:
     void resized() override;
 };
 
-
-
 #endif

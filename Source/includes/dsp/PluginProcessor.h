@@ -10,6 +10,7 @@
 #include "Tremelo.hpp"
 #include "Parameters.hpp"
 #include "EQ.hpp"
+#include "AudioAnalyzer.hpp"
 
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor
@@ -60,6 +61,7 @@ public:
     std::atomic<bool> useRMS { false };
 
     juce::AudioProcessorValueTreeState& getApvts();
+    AudioAnalyzer analyzer;
 
 private:
     //==============================================================================
@@ -76,6 +78,4 @@ private:
 
     std::vector<std::vector<float>> dryBuffer;
     int maxBlockSize = 0;
-    
-    double sr;
 };

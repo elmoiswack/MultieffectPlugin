@@ -26,9 +26,9 @@ Parameters::~Parameters()
 juce::AudioProcessorValueTreeState::ParameterLayout Parameters::initApvts() {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-   this->initOutput(layout);
-   this->initTremelo(layout);
-
+    this->initOutput(layout);
+    this->initTremelo(layout);
+    this->initDelay(layout);
 
     return layout;
 }
@@ -63,8 +63,8 @@ void Parameters::initOutput(juce::AudioProcessorValueTreeState::ParameterLayout&
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "output.lowcut.frequency",
         "Output LowCut",
-        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
-        20.0f
+        juce::NormalisableRange<float>(0.01f, 200.0f, 1.f, 1.0f),
+        0.01f
         ) //Hz
     );
     layout.add(std::make_unique<juce::AudioParameterChoice>(
@@ -83,13 +83,13 @@ void Parameters::initOutput(juce::AudioProcessorValueTreeState::ParameterLayout&
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "output.mid.frequency",
         "Output Mid Frequency",
-        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
+        juce::NormalisableRange<float>(200.0f, 2000.0f, 1.f, 1.f),
         750.0f
         ) //Hz
     );
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "output.mid.gain",
-        "Output Mid Gain",
+        "Output Mid Gain"        ,
         juce::NormalisableRange<float>(-24.0f, 24.0f, 0.5f, 1.f),
         0.0f
         ) //dB
@@ -110,7 +110,7 @@ void Parameters::initOutput(juce::AudioProcessorValueTreeState::ParameterLayout&
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "output.highcut.frequency",
         "Output HighCut Frequency",
-        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.f, 1.f),
+        juce::NormalisableRange<float>(2000.0f, 20000.0f, 1.f, 1.f),
         20000.0f
         ) //Hz
     );
@@ -142,7 +142,7 @@ bool Parameters::getOutputEnabled() const {
 }
 
 bool Parameters::getOutputLowCutEnabled() const {
-    return this->apvts.getRawParameterValue("output.lowcut.enabled")->load();
+    return this->apvts.getRawParameterValue("output.lowcut.enabled")->load() > 0.5;
 }
 
 float Parameters::getOutputLowCutFreq() const {
@@ -166,7 +166,7 @@ float Parameters::getOutputMidQuality() const {
 }
 
 bool Parameters::getOutputHighCutEnabled() const {
-    return this->apvts.getRawParameterValue("output.highcut.enabled")->load();
+    return this->apvts.getRawParameterValue("output.highcut.enabled")->load() > 0.5;
 }
 
 float Parameters::getOutputHighCutFreq() const {
@@ -217,11 +217,36 @@ void Parameters::initDelay(juce::AudioProcessorValueTreeState::ParameterLayout& 
         false
         ) //bool
     );
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "delay.feedbackGain",
+        "Delay FeedbackGain",
+        juce::NormalisableRange<float>(0.01f, 1.0f, 0.01f),
+        .6f
+        )
+    );
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "delay.time",
+        "Delay Time",
+        juce::NormalisableRange<float>(100.0f, 1000.0f, 10.f, 1.f),
+        250.0f
+        )
+    ); 
 }
 
 bool Parameters::getDelayEnabled() const {
     return this->apvts.getRawParameterValue("delay.enabled")->load() > 0.5;
 }
+
+float Parameters::getDelayFeedbackGain() const {
+    return this->apvts.getRawParameterValue("delay.feedbackGain")->load();
+}
+
+float Parameters::getDelayTime() const {
+    return this->apvts.getRawParameterValue("delay.time")->load();
+}
+
 
 //==============================================================================
 //                              TREMELO

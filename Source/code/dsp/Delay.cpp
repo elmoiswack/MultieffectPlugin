@@ -10,9 +10,7 @@ Delay::Delay(double sampleRate, int samplesPerBlock, int numChannels)
 {
 }
 
-Delay::~Delay()
-{
-}
+Delay::~Delay() {}
 
 void Delay::copyBufferIntoDelay(const int& channel, const float* bufferData, const int& bufferLenght) {
 
@@ -76,4 +74,12 @@ int Delay::getBufferLenght() {
 
 int Delay::getWritingPos() {
 	return this->writingPos;
+}
+
+void Delay::setDelayTime(float value) {
+    this->delayTime = value;
+}
+
+void Delay::setFeedbackGain(float value) {
+    this->feedbackGain = value;
 }
